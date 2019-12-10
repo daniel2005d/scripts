@@ -50,7 +50,10 @@ def main():
                 min,sec = time_convert(elapsed_time)
                 results.append({'user':user, 'time':sec})
             else:
-                p('{} not found {}'.format(fg('red'), attr('reset')))
+                print('{} not found {}\r'.format(fg('red'), attr('reset')))
+        except KeyboardInterrupt as k:
+            print('Canceled by User')
+            sys.exit(0)
         except:
             p('{} {} not found                   {}'.format(fg('red'),user, attr('reset')))
 
