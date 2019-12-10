@@ -7,7 +7,6 @@ from termcolor import colored, cprint
 from colored import fg,attr
 
 url = sys.argv[1]
-#url = 'http://10.10.10.150/'
 s = requests.Session()
 resp = s.get(url)
 
