@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import requests,sys,time,argparse
-from colored import fg,attr
+from colored import fg,attr,bg
 
 results = []
 parser = argparse.ArgumentParser('Users enumeration based on response time')
@@ -12,6 +12,9 @@ args = parser.parse_args()
 
 URL = args.url
 file = args.wordlist
+
+#URL = 'http://127.0.0.1:5000/api/recover?email={}'
+#file = '/usr/share/wordlists/rockyou.txt'
 
 def banner():
     print("==========================================")
@@ -26,19 +29,32 @@ def time_convert(sec):
     hours = mins // 60
     mins = mins % 60
     return mins, sec
-    
+
+def p(message):
+    print(message)
+    sys.stdout.write("\033[F")  
 
 def main():
-    f = open(file, 'r')
+    f = open(file, 'r', encoding='ISO-8859-1')
     for line in f.readlines():
         user = line.replace('\n','')
-        now = time.time()
-        resp = requests.get(URL.format(user))
-        end = time.time()
-        elapsed_time = end - now
-        time_convert(elapsed_time)
-        min,sec = time_convert(elapsed_time)
-        results.append({'user':user, 'time':sec})
+        try:
+            p('{}{}Getting {}{}'.format(bg('1'), fg('white'), user, attr('reset')))
+        #p('Getting... ' + user)
+            now = time.time()
+            resp = requests.get(URL.format(user))
+            if resp.status_code != 404:
+                end = time.time()
+                elapsed_time = end - now
+                time_convert(elapsed_time)
+                min,sec = time_convert(elapsed_time)
+                results.append({'user':user, 'time':sec})
+            else:
+                p('{} not found {}'.format(fg('red'), attr('reset')))
+        except:
+            p('{} {} not found                   {}'.format(fg('red'),user, attr('reset')))
+
+        
     
     print_results()
 
