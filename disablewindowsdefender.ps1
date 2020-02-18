@@ -13,7 +13,7 @@ if ($disabled -eq $NULL){
     disableav
 }
 elseif ($disabled -eq 0) {
-   write-host "Av is Disabled"
+   write-host "Av are Disabled"
 }
 else {
    write-host "Disabling AV..." -foregroundcolor Green
