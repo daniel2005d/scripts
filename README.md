@@ -17,4 +17,6 @@ Obtener información de un perfil
 
 
 ### Listas
-* Obtener todos los items de una lista: **[DOMINIO]**/_api/web/lists/getByTitle('*LISTA*')/items
+> Obtener todos los items de una lista: **[DOMINIO]**/_api/web/lists/getByTitle('*LISTA*')/items
+>
+> /_api/web/lists/getByTitle('*Lista*')/items?$filter=(Title%20eq%20%27@**Filtro**%27)&$select=*Campos*&$expand=&$orderby=ID%20asc&$top=9999**
