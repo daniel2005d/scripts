@@ -9,8 +9,9 @@ Obtener información de un perfil
 #### Obtener información de un perfil
 
 > **[DOMINIO]**/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor(accountName=@v)?@v='i:0#.f|membership|__cuenta.dominio__'
+> 
 > **[DOMINIO]**/_api/web/siteUsers: Obtiene el listado de usuarios del portal
->
+> 
 > /_api/Web/GetUserById(**IdUsuario**)
 
 
