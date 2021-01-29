@@ -10,7 +10,7 @@ from pwn import log
 
 class SQLDumper:
     def __init__(self, address, port, db, username, password, domain, table):
-        self.log = log.progress("Dumping")
+        self.log = None
         self.sql = None
         self.address = address 
         self.port = port
@@ -43,36 +43,51 @@ class SQLDumper:
     def __gettables(self):
         tables = self.sql.sql_query("Select name from sys.tables")
         return tables
+
+    def __connect(self):
+        self.sql = tds.MSSQL(self.address, int(self.port))
+        self.sql.connect()
+        login = self.sql.login(self.db, self.username, self.password, self.domain, self.hashes, False)
+        if login:
+            self.sql.sql_query("Select @@Version")
+            self.sql.printReplies()
+            self.sql.printRows()
+        return login
    
 
     def dump(self):
-        totalrecords = 0
-        self.__connect()
-        tables = list()
-        if self.table is None:
-            tables = self.__gettables()
-        else:
-            tables.append({"name":self.table} )
-
-        for t in tables:
-            tablename = t["name"]
-            self.log.status(tablename)
-            totalrecords+=self.__write2file(tablename)
-        log.info("Total Tables: " + str(len(tables)))
-        log.info("Total Records: " + str(totalrecords))
         
-        self.log.success("Finished")
+        totalrecords = 0
+        if self.__connect():
+            self.log = log.progress("Dumping")
+            tables = list()
+            if self.table is None:
+                tables = self.__gettables()
+            else:
+                tables.append({"name":self.table} )
 
-    def __connect(self):
-        ms_sql = tds.MSSQL(self.address, int(self.port))
-        ms_sql.connect()
-        ms_sql.login(self.db, self.username, self.password, self.domain, self.hashes, False)
-        self.sql = ms_sql
-        ms_sql.printReplies()
+            for t in tables:
+                tablename = t["name"]
+                self.log.status(tablename)
+                totalrecords+=self.__write2file(tablename)
+            log.info("Total Tables: " + str(len(tables)))
+            log.info("Total Records: " + str(totalrecords))
+            
+            self.log.success("Finished")
+        else:
+            log.failure('The username or password be incorrect')
+        
+    def closeconnection(self):
+        self.sql.disconnect()
 
 def banner():
-    log.info('Dump all Database Infor\r\n')
-    log.ingo('Version: 1.0')
+    log.indented('Dump all Database Infor\r\n')
+    log.indented('Version: 1.0')
+    log.indented('\r')
+    log.indented('DataBase:'+args.db)
+    log.indented('Server:'+args.ip)
+    log.indented('UserName:'+args.username)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--db', required=True)
@@ -89,6 +104,11 @@ if __name__ == '__main__':
     table = None
     if args.table != '':
         table = args.table
-
+    
     dump = SQLDumper(args.ip,args.port,args.db,args.username,args.password,args.domain,table) 
-    dump.dump()
+    try:
+        dump.dump()
+    except Exception as ex:
+        log.failure(str(ex))
+    finally:
+        dump.closeconnection()
