@@ -1,3 +1,7 @@
+# Microsoft Sql Server
+
+* dumpsqldb.py: Esta basado en msqlclient.py de Impacket. Permite bajar todo el contenido de la base de datos.
+
 # >= SharePoint 2013
 (https://docs.microsoft.com/en-us/SharePoint/install/user-profile-service-overview?redirectedfrom=MSDN)
 
