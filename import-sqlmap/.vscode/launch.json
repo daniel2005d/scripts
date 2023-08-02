@@ -1,0 +1,19 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["-d","~/.local/share/sqlmap/output/api.asistentemovistar.com.mx", "-s", "30.0.1.108", "-u",
+             "postgres", "-p", "3A9eQAHluSe7","-c",",","-D","apiasistente_apiasist_api","-t","tickets_responsables"]
+             
+        }
+    ]
+}
