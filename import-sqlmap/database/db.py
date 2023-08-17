@@ -72,13 +72,6 @@ class DataBase():
         db = self._select(sentence, (name,))
         return db is not None
 
-    def _check_exists_table(self, tablename:str) -> bool:
-        sentence = """
-                        select * from pg_tables where schemaname='public' and tablename=%s
-                    """
-        db = self._select(sentence, (tablename,))
-        return db is not None
-
     def _check_exists_column(self, tablename:str, columnname:str) ->bool:
         sentence = f"SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = %s  and column_name=%s"
         column = self._select(sentence, (tablename, columnname))
@@ -88,6 +81,16 @@ class DataBase():
         sentence = f"SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = %s"
         columns = self._select(sentence, (tablename,))
         return columns
+
+    """
+    Check if Table exists
+    """
+    def check_exists_table(self, tablename:str) -> bool:
+        sentence = """
+                        select * from pg_tables where schemaname='public' and tablename=%s
+                    """
+        db = self._select(sentence, (tablename,))
+        return db is not None
 
     """
     If database exists, drop and create
@@ -110,7 +113,7 @@ class DataBase():
                            CREATE TABLE IF NOT EXISTS public.{name}()
                            """
                self._execute(sentence)
-               if self._check_exists_table(name):
+               if self.check_exists_table(name):
                  self.create_columns(name, columns)
         except Exception as e:
             raise e
@@ -149,9 +152,10 @@ class DataBase():
                         column_type = "varchar(50)"
 
                     sentence += f"ADD COLUMN \"{column.lower()}\" {column_type}"
-                    if index != len(columns)-1:
-                        sentence+=","
+                    sentence+=","
             
+            if sentence.endswith(","):
+                sentence=sentence[:-1]
             if "COLUMN" in sentence:
               self._execute(sentence)
               if self._hashcolumn in sentence:
@@ -159,10 +163,14 @@ class DataBase():
         except Exception as e:
             raise e
   
-    def insert_data(self, tablename, data):
+    def insert_data(self, tablename, data, columns=None):
         try:
+            if columns is None:
+                columns = self._get_columns_from_table(tablename)
+            elif not self._hashcolumn in columns:
+                columns.append(self._hashcolumn)
 
-            columns = self._get_columns_from_table(tablename)
+
             parameters = ''
             columns_insert=''
             
@@ -171,7 +179,7 @@ class DataBase():
             """
             
             for index, c in enumerate(columns):
-                columns_insert+=f'"{c}"'
+                columns_insert+=f'"{c.lower()}"'
                 if index != len(columns)-1:
                     columns_insert+=','
 

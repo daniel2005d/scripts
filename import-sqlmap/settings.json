@@ -1,0 +1,9 @@
+{
+    "directory":"/home/cyb3rb0b/.local/share/sqlmap/output/ventas.movistar.com.mx/",
+    "chardelimiter":",",
+    "host":"30.0.1.108",
+    "username":"postgres",
+    "password":"3A9eQAHluSe7",
+    "database":"STPORTAL",
+    "table":"CMS_USUARIO"
+}

@@ -11,8 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["-d","~/.local/share/sqlmap/output/api.asistentemovistar.com.mx", "-s", "30.0.1.108", "-u",
-             "postgres", "-p", "3A9eQAHluSe7","-c",",","-D","apiasistente_apiasist_api","-t","tickets_responsables"]
+            "args": ["--config","settings.json", "-D","GVSEC_ADMIN"]
              
         }
     ]
