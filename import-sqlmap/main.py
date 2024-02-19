@@ -5,7 +5,9 @@ into personal PostgrsSQL database
 import os
 import sys
 from database.connection import Connection
-from database.db import DataBase
+#from database.db import DataBase, PGdb
+from database.PostgreSQL import PostgreSQL
+from database.MongoDB import MongoDB
 from utils import Util, Hashing
 import argparse
 import re
@@ -13,7 +15,7 @@ import threading
 import json
 
 class ReadContent():
-    def __init__(self,server, username, password, delimiter=',', table=None, recreate=False, database=None) -> None:
+    def __init__(self,server, username, password, delimiter=',', table=None, recreate=False, database=None,dbtype=None) -> None:
         self._delimiter = delimiter
         self._table= table
         self._recreate = recreate
@@ -21,12 +23,19 @@ class ReadContent():
         self._connection = Connection(server=server,username=username,password=password)
         self._DEFAULT_DB='postgres'
         self._max_threads = 1
+        self._dbtype = dbtype
     
     def _get_directories(self, directory:str):
         dumpdir = os.path.join(directory,'dump')
         if os.path.exists(dumpdir):
           directories = [name for name in os.listdir(dumpdir) if os.path.isdir(os.path.join(dumpdir, name))]
           return directories,dumpdir
+
+    def _createDBEngine(self, database=None, connection=None):
+        if self._dbtype == 'postgress':
+            return PostgreSQL(self._DEFAULT_DB if database is None else database, self._connection if connection is None else connection)
+        elif self._dbtype == 'mongo':
+            return MongoDB(self._DEFAULT_DB if database is None else database, self._connection if connection is None else connection)
 
 
     def start(self, directory:str):
@@ -36,10 +45,14 @@ class ReadContent():
           directories,dumpdir = self._get_directories(directory)
         else:
             dumpdir = os.path.join(directory,"dump")
+            if not os.path.exists(dumpdir):
+                Util.print_error(f"Directory {dumpdir} does not exists")
+                sys.exit(-1)
+
             directories.append(self._database)
 
         if directories is not None:
-            db = DataBase(self._DEFAULT_DB, self._connection)
+            db = self._createDBEngine(self._DEFAULT_DB, self._connection) #DataBase(self._DEFAULT_DB, self._connection)
             db.recreate = self._recreate
             
             for dir in directories:
@@ -56,7 +69,7 @@ class ReadContent():
         return matches
 
     def insert_data(self, database:str, path:str):
-        db = DataBase(database, self._connection)
+        db = self._createDBEngine(database, self._connection)
         db.recreate = self._recreate
         file = os.path.basename(path)
         index_ext = file.index('.')
@@ -87,13 +100,12 @@ class ReadContent():
                         columns = [string.lower() for string in fields]
                         table_columns = db._get_columns_from_table(file_name)
                         difference = set(columns)-set(table_columns)
-                        if len(difference) > 0:
-                            db.create_columns(file_name, list(difference))
-
                         if not db.check_exists_table(file_name):
                             message = f"Creating Table {file_name}"
                             Util.print(message, color="magenta")
                             db.create_table(file_name, fields)
+                        elif len(difference) > 0:
+                            db.create_columns(file_name, list(difference))
                     else:
                         finished = ""
                         
@@ -139,11 +151,11 @@ class ReadContent():
     
 def print_arguments(args):
     print(f"""
-            Version: 1.0 \n
+            Version: 1.2 \n
             Directory: {args.directory}
             Character: {args.chardelimiter}
             UserName: {args.username}
-            Host: {args.host}\n
+            Host: {args.host}
             Database: {args.database}
           """)
 if __name__ == '__main__':
@@ -156,6 +168,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--table', required=False, help='Specific table to import')
     parser.add_argument('-D', '--database', required=False, help='Specific database to import')
     parser.add_argument('-f', '--force', required=False, help='Recreate all databases', action="store_true")
+    parser.add_argument('--dbtype',choices=['postgress','mongo'],default='postgress')
     parser.add_argument('--config', help='Config json file. With parameters options')
     args = parser.parse_args()
 
@@ -175,6 +188,6 @@ if __name__ == '__main__':
     print_arguments(args)
     r = ReadContent(delimiter=args.chardelimiter, username=args.username, 
                     server=args.host, password=args.password, table=args.table, 
-                    recreate=args.force, database=args.database)
+                    recreate=args.force, database=args.database, dbtype=args.dbtype)
     
     r.start(args.directory)

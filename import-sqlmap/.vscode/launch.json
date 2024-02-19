@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["--config","settings.json", "-D","GVSEC_ADMIN"]
+            "args": ["--config","settings.json","--dbtype","mongo"]
              
         }
     ]

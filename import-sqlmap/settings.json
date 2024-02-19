@@ -1,9 +1,10 @@
 {
-    "directory":"/home/cyb3rb0b/.local/share/sqlmap/output/ventas.movistar.com.mx/",
+    "directory":"/mnt/g/sqlmap/isva.quindio.gov.co/",
     "chardelimiter":",",
     "host":"30.0.1.108",
     "username":"postgres",
-    "password":"3A9eQAHluSe7",
+    "password":"3A9eQAHluSe7"
+    
     
     
 }
