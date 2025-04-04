@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h4>
+    Host: 
+    <span class="label">{{host[0].hostname if host[0].hostname else host[0].address}}</span>
+    
+    </h4>
+<h6>
+    {%if host[0].addressstatus == 'up'%}
+    <span class="label success"  id="address">
+        {{host[0].address}}
+    </span>
+    {%else%}
+    <span class="label alert">
+        {{host[0].address}} {{host[0].addressstatus}}
+    </span>
+    {%endif%}
+    <i onclick="copy('address')">COPY</i>
+</h6>
+<ul>
+    {%for h in host%}
+    <li>
+        <a href="/ports/{{h.port}}">
+            {{h.port}}
+        </a>
+        <a href="/ports/{{h.hash}}">
+            
+            {{h.servicename if h.servicename else ""}}
+        </a>
+        {{h.productname if h.productname else "" }}
+        
+        {{h.serviceversion if h.serviceversion else ""}}
+        {{h.tunnel if h.tunnel else ""}}
+    </li>
+    {%endfor%}
+    
+</ul>
+
+{% endblock %}

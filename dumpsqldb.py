@@ -80,7 +80,7 @@ class SQLDumper:
     def closeconnection(self):
         self.sql.disconnect()
 
-def banner():
+def banner(args):
     log.indented('Dump all Database Infor\r\n')
     log.indented('Version: 1.0')
     log.indented('\r')
@@ -88,27 +88,27 @@ def banner():
     log.indented('Server:'+args.ip)
     log.indented('UserName:'+args.username)
 
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--db', required=True)
+    parser.add_argument('--username', required=True)
+    parser.add_argument('--password', required=True)
+    parser.add_argument('--ip', required=True)
+    parser.add_argument('--domain')
+    parser.add_argument('--table')
+    parser.add_argument('--port', default=1433)
+    args = parser.parse_args()
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--db', required=True)
-parser.add_argument('--username', required=True)
-parser.add_argument('--password', required=True)
-parser.add_argument('--ip', required=True)
-parser.add_argument('--domain')
-parser.add_argument('--table')
-parser.add_argument('--port', default=1433)
-args = parser.parse_args()
-
-if __name__ == '__main__':
-    banner()
-    table = None
-    if args.table != '':
-        table = args.table
-    
-    dump = SQLDumper(args.ip,args.port,args.db,args.username,args.password,args.domain,table) 
-    try:
-        dump.dump()
-    except Exception as ex:
-        log.failure(str(ex))
-    finally:
-        dump.closeconnection()
+    if __name__ == '__main__':
+        banner(args)
+        table = None
+        if args.table != '':
+            table = args.table
+        
+        dump = SQLDumper(args.ip,args.port,args.db,args.username,args.password,args.domain,table) 
+        try:
+            dump.dump()
+        except Exception as ex:
+            log.failure(str(ex))
+        finally:
+            dump.closeconnection()

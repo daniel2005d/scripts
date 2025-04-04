@@ -25,5 +25,3 @@ def getendpoints(text):
     print(match)
 
 
-content = get_file('https://www.turnosmovistar.com.mx/assets/mask/default/application-afb679f9026a52f7a735ce075e783f50.js')
-getendpoints(content)

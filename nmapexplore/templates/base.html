@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.6.3/css/foundation.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.6.3/js/foundation.min.js"></script>
+</head>
+<body style="background-color: #000000;">
+
+<div class="grid-container">
+    <div class="grid-x">
+        <!-- Sección lateral (menú) -->
+        <div class="cell small-12 medium-4 large-3">
+            <div class="callout">
+                <h3>Ports {{menu.length}}</h3>
+                <ul></ul>
+                {% for item in menu %}<!-- Grupo 1 -->
+                
+                
+                    <li><a href="/ports/{{item.port}}">
+                        <b>{{item.port}}</b>
+                         
+                        <a href="/ports/{{item.hash}}">
+                            <span style="color:#ffaf00">
+                            {{item.servicename if item.servicename else ""}}
+                            {{item.productname  if item.productname else "" }}
+                            {{item.serviceversion if item.serviceversion else ""}}
+{%if item.review %}
+<i class="fi-heart"></i>
+{%endif%}
+        
+        
+                        </span>
+                        </a>
+                        
+                        
+                    </a></li>
+                    
+                
+                {%endfor%}
+            </ul>
+                <!-- Hosts -->
+                <h3>Hosts</h3>
+                <ul>
+                    {%for h in hosts%}
+                    <li>
+                        <a href="#">
+                            <a href="/host/{{h.address}}">
+                                {{h.address}}
+                            </a>
+                            
+                            
+                            
+                        </a>
+                    
+                    </li>
+                    {%endfor%}
+                </ul>
+
+               
+            </div>
+        </div>
+
+        <!-- Sección central (contenido) -->
+        <div class="cell small-12 medium-8 large-9">
+            <div class="callout" style="height: 100%;">
+                
+                <p>
+                    {% block content %} {% endblock %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).foundation();
+
+    function copy(elementid) {
+        // Get the text field
+        var copyText = document.getElementById(elementid);
+
+        // Select the text field
+        //copyText.select();
+        //copyText.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(copyText.innerText);
+
+    // Alert the copied text
+    //alert("Copied the text: " + copyText.value);
+} 
+</script>
+
+</body>
+</html>

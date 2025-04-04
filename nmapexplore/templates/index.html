@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h4>Scans: </h4>
+
+<ul>
+
+    {%for a in assets%}
+    <li>{{a.address}}</li>
+    {%endfor%}
+</ul>
+
+{% endblock %}

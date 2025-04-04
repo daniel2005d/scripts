@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{%for key, value in ports.items() %}
+<h2>
+    
+    Port: {{ports[key]["port"]}} 
+    <button class="hollow success button" type="submit">
+        {%if ports[key]["review"]%}
+            <i class="fi-heart" style="color: blue;"></i>
+        {%else%}
+        <i class="fi-heart" ></i>
+        {%endif%}
+    </button>
+</h2>
+<hr>
+<h3>
+
+    {{ports[key]["servicename"] if ports[key]["servicename"] else ""}}
+
+    <a href="/ports/{{ports[key]['hash']}}">
+        {{ports[key]["productname"] if ports[key]["productname"] else ""}}
+        {{ports[key]["version"] if ports[key]["version"] else ""}}
+    </a>
+</h3>
+<h5>HostNames</h5>
+<ul>
+    
+    {%for info in ports[key]["extrainfo"] %}
+    <li>
+        <a href="{{ports[key]['extrainfo']}}" target="_blank">
+            {{info}}
+        </a>
+    </li>
+    {%endfor%}
+</ul>
+
+
+<hr>
+<ul>
+    {%for h in ports[key]["hosts"]%}
+
+    <li>
+        <a href="/host/{{h.address}}">
+            <span id="address">{{h.address}} </span>
+            <b>{{h.name}}</b>
+        </a>
+        <i onclick="copy('address')">COPY</i>
+    </li>
+    {%endfor%}
+
+</ul>
+
+
+<!-- {{ports[key]['hosts']}} -->
+{%endfor%}
+{% endblock %}
