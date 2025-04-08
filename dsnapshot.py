@@ -1,5 +1,7 @@
 from seleniumwire import webdriver
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from urllib.parse import urlparse
 import os
 import argparse
@@ -11,15 +13,18 @@ from time import sleep
 class Browser:
 
     def __init__(self, visible=True):
-        self._chromepath = "chromedriver"
+        self._chromepath = "/mnt/hgfs/D/Proyectos/scripts/chromedriver"
         self._headers = {}
         chrome_options = Options()
         #chrome_options.add_argument('--proxy-server=http://localhost:8080')
         chrome_options.add_argument("--start-maximized")
         if not visible:
             chrome_options.add_argument("--headless")
+        
 
-        self._driver = webdriver.Chrome(options=chrome_options)
+        service = Service(self._chromepath)
+        self._driver = webdriver.Chrome(service=service, options=chrome_options)
+         
     
     def _request_handler(self, request): 
         for h in self._headers:
@@ -96,12 +101,7 @@ class Main:
           response = self._browser.get_response(domain)
 
           contenttype = response.headers["Content-Type"]
-        #   if "application/binary" in contenttype:
-        #       binary=requests.get(domain)
-        #       imagename, folderpath = self._get_imagename()
-        #       img = open(imagename, 'wb')
-        #       img.write(binary.body())
-        #       img.close()
+        
 
           sleep(2)
           b64 = self._browser.get_snapshot()
@@ -111,11 +111,16 @@ class Main:
         self._create_html()
         self._browser.close()
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-l","--domains", required=True)
-    parser.add_argument("-H", action="append")
-    parser.add_argument("--hidden", action="store_false")
+    parser.add_argument("-l","--domains", required=True, help="File with urls list")
+    parser.add_argument("-H", action="append", help="Additional headers")
+    parser.add_argument("--hidden", action="store_false", help="Hide Browser.")
     args = parser.parse_args()
     m = Main(args)
     m.scan()
+
+if __name__ == '__main__':
+    main()
+    
+    

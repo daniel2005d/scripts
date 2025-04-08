@@ -1,5 +1,6 @@
 Requests==2.31.0
 beautifulsoup4==4.9.3
+blinker==1.4
 clipboard==0.0.4
 colored==2.3.0
 pwn==1.0
