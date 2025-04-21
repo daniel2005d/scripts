@@ -7,13 +7,16 @@ import os
 import argparse
 import base64
 import uuid
-import requests
 from time import sleep
+from utils.colors import Color
+from utils.folder import Folder
 
 class Browser:
 
     def __init__(self, visible=True):
-        self._chromepath = "/mnt/hgfs/D/Proyectos/scripts/chromedriver"
+        
+        
+        self._chromepath = Folder.get_chromedriver_path()
         self._headers = {}
         chrome_options = Options()
         #chrome_options.add_argument('--proxy-server=http://localhost:8080')
@@ -55,7 +58,7 @@ class Main:
     def __init__(self, args):
         self._browser = Browser(args.hidden)
         self._filelist = args.domains
-        self._savedimages={}
+        self._saved_images={}
         self._headers = None
         if args.H:
             self._headers = args.H
@@ -63,9 +66,11 @@ class Main:
     def _create_folder(self, url):
         parsed_url = urlparse(url)
         domain = parsed_url.netloc
-        if not os.path.exists(domain):
-            os.mkdir(domain)
-        return domain
+        output_folder = os.path.join( Folder.get_current_folder(),domain)
+        if not os.path.exists(output_folder):
+            os.mkdir(output_folder)
+        return output_folder
+    
     
     def _get_imagename(self):
       tmpimagename = str(uuid.uuid4())+".png"
@@ -80,34 +85,33 @@ class Main:
         return tmpimagename
 
     def _create_html(self):
-        index = open(os.path.join(self._folder, "index.html"),'w')
+        output_file = os.path.join(self._folder, "index.html") 
+        index = open(output_file,'w')
         html="<div class='row'>"
-        for d in self._savedimages:
-            html+=f"<div class='row'><div class='col-md-12'><img style='width: 20%;' src='{self._savedimages[d]}'></div><div class='col-md-12'>{d}</div></div>"
+        for d in self._saved_images:
+            html+=f"<div class='row'><div class='col-md-12'><img style='width: 20%;' src='{self._saved_images[d]}'></div><div class='col-md-12'>{d}</div></div>"
         html+="<div class='row'>"
         index.write(html)
+        Color.print(f"[green]File saved on [bold]{output_file}[reset]")
     
     def scan(self):
-        domains = open(self._filelist, 'r')
-        count=1
+        domains = open(self._filelist, 'r').readlines()
+        
         if self._headers:
             for h in self._headers:
               self._browser.add_header(h)
-        for d in domains:
-          print(f"\rTaking Snapshop {count}", end='')
+        for index, d in enumerate(domains):
+          Color.print(f"\r[yellow]Taking Snapshot [bold]{index}/{len(domains)-1}[reset]", end='')
           domain = d.strip()
           self._folder = self._create_folder(domain)
           self._browser.navigate(domain)
-          response = self._browser.get_response(domain)
-
-          contenttype = response.headers["Content-Type"]
-        
-
-          sleep(2)
+          #response = self._browser.get_response(domain)
+          #sleep(2)
           b64 = self._browser.get_snapshot()
-          imagename = self._save_image(b64)
-          self._savedimages[domain]=imagename
-          count+=1
+          image_name = self._save_image(b64)
+          self._saved_images[domain]=image_name
+        print("")
+          
         self._create_html()
         self._browser.close()
 
@@ -119,6 +123,7 @@ def main():
     args = parser.parse_args()
     m = Main(args)
     m.scan()
+
 
 if __name__ == '__main__':
     main()
