@@ -1,4 +1,5 @@
 from colored import Style, Fore, Back, fore, style
+from datetime import datetime
 import re
 
 class Color:
@@ -31,8 +32,13 @@ class Color:
         Color.print(f"[red][-] {message}[reset]")
     
     @staticmethod
-    def print_info(message):
-        Color.print(f"[blue][!] {message}[reset]")
+    def print_info(message, end=None):
+        Color.print(f"[blue][!] {message}[reset]", end=end)
+    
+    def print_timestamp(message):
+        current = datetime.now()
+        current_time = current.strftime("%d-%m-%Y %H:%M:%S")
+        Color.print(f"[aquamarine_1a][{current_time}] {message} [reset]")
     
     @staticmethod
     def print(message, end=None):
@@ -50,3 +56,6 @@ class Color:
         formatted = False
         hight_light = re.sub(match_word, f"[{color}]{match_word}[reset]", text, flags=re.IGNORECASE)
         return Color.format(hight_light), formatted
+
+if __name__ == '__main__':
+    Color.print_allcolors()

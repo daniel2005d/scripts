@@ -17,3 +17,5 @@ Requires-Dist: selenium==4.10.0
 Requires-Dist: selenium_wire==5.1.0
 Requires-Dist: termcolor==2.3.0
 Requires-Dist: blinker==1.4
+Requires-Dist: PyExifTool==0.5.6
+Requires-Dist: lxml==5.3.1

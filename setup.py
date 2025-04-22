@@ -21,8 +21,10 @@ setup(
     
     install_requires=["colored==2.3.0","rich==14.0.0","clipboard==0.0.4","beautifulsoup4==4.9.3",
                     "pwn==1.0","Requests==2.31.0","selenium==4.10.0",
-                    "selenium_wire==5.1.0","termcolor==2.3.0","blinker==1.4"], 
-    packages=["nmapexplore", "utils"],
+                    "selenium_wire==5.1.0","termcolor==2.3.0","blinker==1.4",
+                    "PyExifTool==0.5.6",
+                    "lxml==5.3.1"], 
+    packages=["nmapexplore", "utils","crawler"],
     entry_points={
         "console_scripts": [
             "run-mergeuserpass=merge_userpass:main",
@@ -32,7 +34,9 @@ setup(
             "run-nxc=nxc:main",
             "run-dumpsql=dumpsqldb:main",
             "run-nmapp=nmapexplore.app:main",
-            "run-snapshot=dsnapshot:main"
+            "run-snapshot=dsnapshot:main",
+            "run-metadata=crawler.doc_crawler:main",
+
         ],
     },
     classifiers=[

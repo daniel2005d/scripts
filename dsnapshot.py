@@ -56,6 +56,7 @@ class Browser:
 
 class Main:
     def __init__(self, args):
+        self._sleep = args.sleep
         self._browser = Browser(args.hidden)
         self._filelist = args.domains
         self._saved_images={}
@@ -106,7 +107,7 @@ class Main:
           self._folder = self._create_folder(domain)
           self._browser.navigate(domain)
           #response = self._browser.get_response(domain)
-          #sleep(2)
+          sleep(self._sleep)
           b64 = self._browser.get_snapshot()
           image_name = self._save_image(b64)
           self._saved_images[domain]=image_name
@@ -118,6 +119,7 @@ class Main:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-l","--domains", required=True, help="File with urls list")
+    parser.add_argument("-s","--sleep", required=False, help="Time to sleep between each request. Default 2", default=2, type=int)
     parser.add_argument("-H", action="append", help="Additional headers")
     parser.add_argument("--hidden", action="store_false", help="Hide Browser.")
     args = parser.parse_args()

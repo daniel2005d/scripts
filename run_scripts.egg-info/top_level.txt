@@ -1,4 +1,5 @@
 color_text
+crawler
 dsnapshot
 dumpsqldb
 enumusersbytime
@@ -9,3 +10,4 @@ merge_userpass
 nmapexplore
 nxc
 parse_nmap
+utils

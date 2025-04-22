@@ -16,3 +16,18 @@ class Folder:
     def get_chromedriver_path():
         script_path = Folder.get_script_folder()
         return os.path.join(script_path,"chromedriver")
+    
+    @staticmethod
+    def get_local_folder():
+        local_path = os.path.expanduser("~/.local/doc_crawler")
+        if not os.path.exists(local_path):
+            os.makedirs(local_path)
+        
+        return local_path
+    
+    @staticmethod
+    def create_folder(path:str):
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+    

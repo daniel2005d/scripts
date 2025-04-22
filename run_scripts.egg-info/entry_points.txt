@@ -2,6 +2,7 @@
 run-colortext = color_text:main
 run-dumpsql = dumpsqldb:main
 run-mergeuserpass = merge_userpass:main
+run-metadata = crawler.doc_crawler:main
 run-nmapp = nmapexplore.app:main
 run-nxc = nxc:main
 run-parsenmap = parse_nmap:main
