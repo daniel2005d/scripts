@@ -23,7 +23,8 @@ setup(
                     "pwn==1.0","Requests==2.31.0","selenium==4.10.0",
                     "selenium_wire==5.1.0","termcolor==2.3.0","blinker==1.4",
                     "PyExifTool==0.5.6",
-                    "lxml==5.3.1"], 
+                    "lxml==5.3.1",
+                    "PyPDF2==2-3.0.1"], 
     packages=["nmapexplore", "utils","crawler"],
     entry_points={
         "console_scripts": [

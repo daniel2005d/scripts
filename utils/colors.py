@@ -51,11 +51,18 @@ class Color:
         """
         print(Color.format(message), end=end)
     
+    @staticmethod
     def highlight_text(text:str, match_word:str, color:str='red')->str:
+        positions = []
         text = str(text)
         formatted = False
-        hight_light = re.sub(match_word, f"[{color}]{match_word}[reset]", text, flags=re.IGNORECASE)
-        return Color.format(hight_light), formatted
+        hight_light = re.sub(match_word, f"[{color}][bold]{match_word}[reset]", text, flags=re.IGNORECASE)
+        formatted = hight_light!=text
+        if formatted:
+            for match in re.finditer(re.escape(match_word),hight_light, flags=re.IGNORECASE):
+                positions.append([match.start(), match.end()])
+
+        return Color.format(hight_light), formatted, positions
 
 if __name__ == '__main__':
     Color.print_allcolors()
