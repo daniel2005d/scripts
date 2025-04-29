@@ -24,7 +24,7 @@ setup(
                     "selenium_wire==5.1.0","termcolor==2.3.0","blinker==1.4",
                     "PyExifTool==0.5.6",
                     "lxml==5.3.1",
-                    "PyPDF2==2-3.0.1"], 
+                    "pypdf==4.3.1"], 
     packages=["nmapexplore", "utils","crawler"],
     entry_points={
         "console_scripts": [
