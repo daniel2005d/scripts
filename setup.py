@@ -25,7 +25,7 @@ setup(
                     "PyExifTool==0.5.6",
                     "lxml==5.3.1",
                     "PyPDF2==3.0.1"], 
-    packages=["nmapexplore", "utils","crawler"],
+    packages=["utils","crawler"],
     entry_points={
         "console_scripts": [
             "run-mergeuserpass=merge_userpass:main",
@@ -34,7 +34,7 @@ setup(
             "run-pwdprocessor=pwdprocessor:main",
             "run-nxc=nxc:main",
             "run-dumpsql=dumpsqldb:main",
-            "run-nmapp=nmapexplore.app:main",
+            "run-nmapp=parse_nmap",
             "run-snapshot=dsnapshot:main",
             "run-metadata=crawler.doc_crawler:main",
 
