@@ -13,6 +13,7 @@ setup.py
 crawler/__init__.py
 crawler/data.py
 crawler/doc_crawler.py
+crawler/metadata.py
 nmapexplore/__init__.py
 nmapexplore/app.py
 nmapexplore/beautynmap.py
@@ -28,3 +29,4 @@ run_scripts.egg-info/top_level.txt
 utils/__init__.py
 utils/colors.py
 utils/folder.py
+utils/ui.py
