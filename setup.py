@@ -34,7 +34,7 @@ setup(
             "run-pwdprocessor=pwdprocessor:main",
             "run-nxc=nxc:main",
             "run-dumpsql=dumpsqldb:main",
-            "run-nmapp=parse_nmap",
+            "run-nmapp=parse_nmap:main",
             "run-snapshot=dsnapshot:main",
             "run-metadata=crawler.doc_crawler:main",
 
