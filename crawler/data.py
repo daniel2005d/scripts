@@ -56,12 +56,25 @@ class DBData:
         query = session.query(Files).where(Files.url == url).all()
         #session.close()
         return query
+
+    def get_files(self):
+        rows = []
+        session = self._Session()
+        query = session.query(Files.url).join(Metadata, Metadata.file_id == Files.id).where(Metadata.value != "").distinct()
+        result = query.all()
+        for item in result:
+            rows.append(Files(url=item.url))
+
+        session.close()
+        return rows
+
+        
     
     def get_metadata(self, filters) -> MetadataItem:
         session = self._Session()
         conditions = [Metadata.key.like(f"%{k}") for k in filters]
         query = session.query(Metadata, Files.url).join(Files, Files.id == Metadata.file_id).where(
-            or_(*conditions)).distinct()
+            or_(*conditions)).where(Metadata.value != "").distinct()
         
         result = query.all()
         rows = []
@@ -72,10 +85,14 @@ class DBData:
     
     def get_users(self):
         return self.get_metadata(['Author','author','user','User'])
+
+    def get_software(self):
+        return self.get_metadata(['Producer','Creator','Author','CreatorTool','Software','ProcessingSoftware','Make','Model'])
+         
         
 
-    def get_summary(self):
-        return self.get_metadata(['Author','Creator'])
+
+    
         
 
     

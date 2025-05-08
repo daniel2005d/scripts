@@ -167,26 +167,7 @@ class Crawler:
                 authors.add(item.value)
                 if users_output:
                     users_output.write(f'{item.value}\n')
-        
 
-    def _print_summary(self):
-        summary = self._db.get_summary()
-        if len(summary) > 0:
-            
-            software = set()
-            software_table = Table(title="Software")
-            software_table.add_column("Software", style="green")
-
-            for item in summary:
-                if item.key == "PDF:Creator":
-                    if item.value not in software:
-                        software.add(item.value)
-
-            for s in software:
-                software_table.add_row(s)
-
-            self._console.print(software_table)
-   
     
     def _get_metadata(self, file_name:str) -> dict:
         
@@ -264,7 +245,7 @@ class Crawler:
         #Color.print_info(f'{url}', end='\r')
         #self._progress.print(f"[white][▼][bold]{url}[reset]")
         self._progress.update(self._task, url=url)
-        
+        abs_url = None
         try:
             self._summary.append(url)
             r = requests.get(url)
@@ -280,7 +261,8 @@ class Crawler:
                     self.start(abs_url)
                     
         except requests.exceptions.RequestException as e:
-            self._progress.print(e)
+            self._progress.print(f"[X] {abs_url}")
+            #self._progress.print(e)
         except Exception as e:
             self._progress.print(e)
     
@@ -294,6 +276,45 @@ class Crawler:
             self._print_users(users)
         else:
             self._console.print(f"[green][*][yellow] Users not found for [bold]{self._seed}")
+    
+    def url(self):
+        files = self._db.get_files()
+        if self._file_export:
+            url_output = open(self._file_export, '+a')
+            for file in files:
+                url_output.write(file.url+"\n")
+
+        ui.print_table(files)
+    
+    def all(self):
+        row_users = []
+        row_sw = []
+        distinct_users = set()
+        distinct_sw = set()
+        users = self._db.get_users()
+        comments = self._db.get_metadata(["Comments"])
+        software = self._db.get_software()
+        comments_length = len(comments)
+        
+        
+        if len(users) >0:
+            for u in users:
+                if u.value not in distinct_users:
+                    distinct_users.add(u.value)
+                    row_users.append(u)
+
+            
+        
+        if len(software)>0:
+            for sw in software:
+                if sw.value not in distinct_sw:
+                    distinct_sw.add(sw.value)
+                    row_sw.append(sw)
+            
+        self._console.print(f"[green][*] Users [bold]{len(row_users)}[reset]")
+        self._console.print(f"[green][*] Software [bold]{len(row_sw)}[reset]")
+        self._console.print(f"[green][*] Comments [bold]{comments_length}[reset]")
+
 
     def crawler(self, args):
         try:
@@ -303,9 +324,14 @@ class Crawler:
                 self.users()
             elif args.enumerate == 'comments':
                 self.comments()
+            elif args.enumerate == 'url':
+                self.url()
+            elif args.enumerate == 'all':
+                self.all()
             elif args.read:
                 reader = Reader(self._seed)
                 reader.read()
+            
             else:
                 with self._progress:
                     self.start()
@@ -318,7 +344,7 @@ class Crawler:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i","--input", required=True, help="Single domain or file with list of URls")
-    parser.add_argument("-e","--enumerate",  required=False, choices=["users","software","comments"])
+    parser.add_argument("-e","--enumerate",  required=False, choices=["users","software","comments","all","url"])
     parser.add_argument("-r","--read",  required=False, action='store_true')
     parser.add_argument("-o","--output",  required=False, type=str)
     args = parser.parse_args()
@@ -339,6 +365,7 @@ def main():
     executor = ThreadPoolExecutor(max_workers=len(domains))
 
     for domain in domains:
+        ui.console.print(f"[yellow]{domain}[reset]")
         crawler = Crawler(domain)
         if args.read is None and args.enumerate is None:
             executor.submit(crawler.crawler, args)

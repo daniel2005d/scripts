@@ -30,12 +30,13 @@ def print_table(items:list, exclude_columns=None, key_column:str=None):
                     item_value = datetime.strftime(item_value, "%D %M %Y")
                 elif isinstance(item_value, int):
                     item_value = str(item_value)
+                
 
                 if not distinct:
                     filters.add(item_value)
 
-                if item_value not in filters:
-                    rows.append(item_value)
+                #if item_value not in filters:
+                rows.append(item_value)
             
             table.add_row(*rows)
         
