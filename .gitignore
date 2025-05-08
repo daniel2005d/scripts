@@ -1,6 +1,7 @@
 .vscode
 __pycache__
-.json
-.js
-.db
-.txt
+*.json
+*.js
+*.db
+*.txt
+run_scripts.egg-info/
