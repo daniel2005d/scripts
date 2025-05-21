@@ -107,7 +107,7 @@ class Reader:
             
 
 class Crawler:
-    def __init__(self, seed:str):
+    def __init__(self, seed:str, headers=None):
         if not seed.startswith("http"):
             seed = f"http://{seed}" 
         self._seed = seed
@@ -132,6 +132,7 @@ class Crawler:
         self._downloaded_task = self._progress.add_task("[yellow]Downloading...", url="...", total=100, visible=False)
         self._threads = []
         self._console = Console()
+        self._headers = headers
         self._init()
     
     def _init(self):
@@ -197,6 +198,19 @@ class Crawler:
         
         return metadata
 
+    def _do_get(self, url:str, *args):
+        headers = None
+        if self._headers:
+            headers = {}
+            for h in self._headers:
+                if ':' in h:
+                    header = h.split(":",1)
+                    headers[header[0]]=header[1].lstrip(" ")
+                else:
+                    self._progress.print(f"Header {h} is not valid.")
+        
+        return requests.get(url,headers=headers, *args)
+                
     def _download_file(self, url:str):
         query = self._db.select_files(url)
         if len(query) == 0:
@@ -204,7 +218,7 @@ class Crawler:
             self._progress.update(self._downloaded_task, url=file_name, advance=0,total=100, visible=True)
             target_path = os.path.join(self._files_folder,file_name)
             if not os.path.exists(target_path):
-                resp = requests.get(url, stream=True)
+                resp = self._do_get(url, stream=True)
                 resp.raise_for_status()
                 self._progress.update(self._downloaded_task, total=int(resp.headers.get('Content-Length', 0)))
                 with open(target_path, "wb") as f:
@@ -242,27 +256,34 @@ class Crawler:
         page = self._db.select_page(url)
         if len(page) == 0:
             self._db.add(Pages(url=url))
-        #Color.print_info(f'{url}', end='\r')
-        #self._progress.print(f"[white][▼][bold]{url}[reset]")
+        
         self._progress.update(self._task, url=url)
         abs_url = None
         try:
             self._summary.append(url)
-            r = requests.get(url)
+            #r = requests.get(url)
+            if "favorites" in url:
+                print("")
+            r = self._do_get(url)
+            
             r.raise_for_status()
             soup = BeautifulSoup(r.content, 'html.parser')
             for link in soup.find_all('a', href=True):
                 href = link["href"]
                 abs_url = urljoin(url, href)
                 if self._is_document_valid(abs_url):
-                    #self._executor.submit(self._download_file, abs_url)
                     self._download_file(abs_url)
                 elif abs_url.startswith(self._seed):
                     self.start(abs_url)
                     
         except requests.exceptions.RequestException as e:
-            self._progress.print(f"[X] {abs_url}")
-            #self._progress.print(e)
+            if abs_url:
+                self._progress.print(f"[X] {abs_url}")
+            elif url:
+                self._progress.print(f"[X] {url}")
+            else:
+                self._progress.print(f"[X] {e}")
+            
         except Exception as e:
             self._progress.print(e)
     
@@ -347,6 +368,7 @@ def main():
     parser.add_argument("-e","--enumerate",  required=False, choices=["users","software","comments","all","url"])
     parser.add_argument("-r","--read",  required=False, action='store_true')
     parser.add_argument("-o","--output",  required=False, type=str)
+    parser.add_argument("-H","--header",  required=False, action='append')
     args = parser.parse_args()
     domains = set()
     if os.path.isfile(args.input):
@@ -366,7 +388,7 @@ def main():
 
     for domain in domains:
         ui.console.print(f"[yellow]{domain}[reset]")
-        crawler = Crawler(domain)
+        crawler = Crawler(domain, headers=args.header)
         if args.read is None and args.enumerate is None:
             executor.submit(crawler.crawler, args)
         else:
